@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createArena } from './arena.mjs';
 import { createFighter } from './fighter.mjs';
 import { createVeterano, VETERANO_MESH_STATS } from './veterano-mesh.mjs';
+import { loadVeteranoGLB, VETERANO_GLB_URL } from './veterano-glb.mjs';
 import { downloadVeteranoGLB } from './export-veterano.mjs';
 import { ATTACKS, samplePose, isImpactFrame, clamp } from './motions.mjs';
 
@@ -23,7 +24,7 @@ renderer.toneMappingExposure=1.37;
 const scene=new THREE.Scene();
 const arena=createArena(scene);
 const camera=new THREE.PerspectiveCamera(40,1,.05,160);
-const player=createVeterano({x:-1.23});
+let player=createVeterano({x:-1.23});
 const enemy=createFighter({x:1.23,accent:0x48bfda,dummy:true});
 scene.add(player.root,enemy.root);
 let inspect3D=false;
@@ -37,8 +38,15 @@ $('exportGlb')?.addEventListener('click',async()=>{
  const b=$('exportGlb');if(b.disabled)return;
  b.disabled=true;b.textContent='GERANDO...';
  try{
-  const size=await downloadVeteranoGLB(player);
-  showFeedback('MODELO GLB EXPORTADO ('+Math.round(size/1024)+' KB)',2.0);
+  if(player.sourceGLB){
+   const a=document.createElement('a');a.href=VETERANO_GLB_URL;
+   a.download='shadow-clash-veterano-rig-3d.glb';
+   document.body.append(a);a.click();a.remove();
+   showFeedback('BAIXANDO O MODELO 3D REAL',2.0);
+  }else{
+   const size=await downloadVeteranoGLB(player);
+   showFeedback('MODELO GLB EXPORTADO ('+Math.round(size/1024)+' KB)',2.0);
+  }
  }catch(error){
   console.error('Erro ao exportar o GLB',error);
   showFeedback('ERRO NO GLB — VER CONSOLE',2.3);
@@ -252,3 +260,21 @@ healthUpdate();
 $('loading').classList.add('done');
 showFeedback('VETERANO 3D · DISTRITO DAS SOMBRAS',1.8);
 render();
+// Replace procedural fallback with the rigged GLB. Never interrupt gameplay
+// when the network or mobile device cannot load the asset.
+loadVeteranoGLB({x:-1.23}).then(real=>{
+  const position=player.root.position.clone();
+  const previous=player;
+  real.root.position.copy(position);
+  real.bob.position.y=jumpHeight;
+  scene.add(real.root);
+  scene.remove(previous.root);
+  player=real;
+  console.info('Veterano GLB importado:',real.mesh.geometry.getAttribute('position').count,
+    'vertices;',real.mesh.skeleton.bones.length,'ossos;',
+    real.animations.length,'clipes embutidos');
+  showFeedback('VETERANO 3D · GLB IMPORTADO',1.4);
+}).catch(error=>{
+  console.error('Falha no GLB, personagem procedural permanece ativo:',error);
+  showFeedback('GLB INDISPONÍVEL · MODO RESERVA',1.5);
+});
