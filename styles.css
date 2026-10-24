@@ -18,3 +18,14 @@ body{touch-action:none}#game{position:relative;width:100%;height:100%;min-height
 .inspect{margin-left:auto;border-color:#7fcbd088;color:#b8edf0;white-space:nowrap;font-weight:800}
 .inspect.active,.inspect[aria-pressed="true"]{background:#215768cc;color:#e9ffff;border-color:#8be3f4;box-shadow:0 0 12px #3db7db44}
 @media(max-width:780px),(pointer:coarse){.inspect{margin-left:auto;font-size:11px;padding:6px 10px}.reset{white-space:nowrap}}
+
+
+/* Mobile portrait: allocate an actual widescreen-ish stage instead of
+   rendering the entire portrait viewport as an extremely tall 3D camera.
+   The lower portion remains free for status and touch controls. */
+@media (max-width:780px) and (orientation:portrait){
+ #scene{height:63dvh;min-height:360px;width:100%;display:block}
+ .hud{top:77px}
+ .bottom-ui{bottom:158px}
+ .feedback{top:27%}
+}
