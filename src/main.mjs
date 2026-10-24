@@ -234,7 +234,10 @@ function render(){
   const mid=(player.root.position.x+enemy.root.position.x)/2;
   const distance=Math.abs(enemy.root.position.x-player.root.position.x);
   const portrait=window.innerWidth<700;
-  const desiredZ=(portrait?10.9:10.1)+Math.max(0,distance-2.5)*.97;
+  // Keep both fighters large and within horizontal field of view on narrow phones.
+  const horizontalHalf=Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5)*camera.aspect);
+  const required=(distance+1.8)/(2*Math.tan(horizontalHalf));
+  const desiredZ=Math.max(portrait?8.6:8.4,required);
   target.set(mid*.65,1.77,desiredZ);
   camera.position.lerp(target,Math.min(1,dt*2.9));
   camera.position.x+=(Math.random()-.5)*screenShake;
