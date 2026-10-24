@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createArena } from './arena.mjs';
 import { createFighter } from './fighter.mjs';
 import { createVeterano, VETERANO_MESH_STATS } from './veterano-mesh.mjs';
+import { downloadVeteranoGLB } from './export-veterano.mjs';
 import { ATTACKS, samplePose, isImpactFrame, clamp } from './motions.mjs';
 
 const $=id=>document.getElementById(id);
@@ -32,6 +33,17 @@ function toggle3DView(){
  $('view360')?.classList.toggle('active',inspect3D);
 }
 $('view360')?.addEventListener('click',toggle3DView);
+$('exportGlb')?.addEventListener('click',async()=>{
+ const b=$('exportGlb');if(b.disabled)return;
+ b.disabled=true;b.textContent='GERANDO...';
+ try{
+  const size=await downloadVeteranoGLB(player);
+  showFeedback('MODELO GLB EXPORTADO ('+Math.round(size/1024)+' KB)',2.0);
+ }catch(error){
+  console.error('Erro ao exportar o GLB',error);
+  showFeedback('ERRO NO GLB — VER CONSOLE',2.3);
+ }finally{b.disabled=false;b.textContent='BAIXAR 3D';}
+});
 console.info('Malha 3D do Veterano:',VETERANO_MESH_STATS);
 const target=new THREE.Vector3();
 const keys=new Set();
