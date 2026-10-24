@@ -29,3 +29,82 @@ body{touch-action:none}#game{position:relative;width:100%;height:100%;min-height
  .bottom-ui{bottom:158px}
  .feedback{top:27%}
 }
+
+/* Shadow Clash landscape-first mobile mode. The arena remains full-screen
+   instead of reserving a separate portrait band for UI. */
+#game {height:100vh;height:100dvh;min-height:0;overflow:hidden}
+#scene {height:100%;height:100dvh}
+.rotate-notice {display:none}
+@media (orientation:portrait) and (pointer:coarse){
+  .rotate-notice{
+    display:flex;position:absolute;inset:0;z-index:8;align-items:center;
+    justify-content:center;flex-direction:column;gap:16px;text-align:center;
+    background:radial-gradient(circle at 50% 35%,#1c3849f2,#060d17fb 78%);
+    padding:calc(22px + env(safe-area-inset-top,0px)) 24px calc(22px + env(safe-area-inset-bottom,0px));
+  }
+  .rotate-symbol{font-size:74px;color:#71dfec;line-height:1;transform:rotate(-90deg)}
+  .rotate-notice h2{font-size:clamp(21px,5vw,32px);letter-spacing:.16em;line-height:1.2;margin:0;font-weight:900}
+  .rotate-notice p{max-width:315px;font-size:15px;line-height:1.55;color:#c0d4dc;margin:0}
+  .rotate-notice button{border:1px solid #5ce0ed;border-radius:8px;color:#08121c;background:#7be5ed;font-weight:900;letter-spacing:.05em;padding:14px 18px;font-size:13px;min-height:46px}
+  .rotate-notice span{max-width:290px;font-size:12px;color:#9cadb7;line-height:1.5}
+}
+/* Phone held horizontally: wide side-view arena, HUD at the top, two
+   touch-control clusters in the bottom corners, no vertical scrolling. */
+@media (orientation:landscape) and (pointer:coarse) {
+  #game,#scene{width:100%;height:100vh;height:100dvh;min-height:0}
+  .topbar{top:0;left:0;right:0;padding:6px max(12px,env(safe-area-inset-right,0px)) 5px max(12px,env(safe-area-inset-left,0px));gap:8px;align-items:flex-start}
+  .brand{gap:7px}.mark{font-size:26px}.brand strong{font-size:12px;letter-spacing:.10em}
+  .brand small{font-size:7px;margin-top:4px;letter-spacing:.1em}
+  .round-tag{display:none}
+  .reset{padding:6px 9px;font-size:11px;min-height:30px}
+  .reset span{display:none}
+  .inspect{margin-left:auto;font-size:10px;padding:6px 9px}
+  .hud{
+    top:43px;left:max(12px,env(safe-area-inset-left,0px));
+    right:max(12px,env(safe-area-inset-right,0px));
+    grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:10px
+  }
+  .fighter-title{display:flex;align-items:center;justify-content:space-between;padding-bottom:5px;gap:5px}
+  .right .fighter-title{flex-direction:row-reverse}
+  .fighter-title strong{font-size:11px;letter-spacing:.07em}
+  .fighter-title span{font-size:8px;margin:0}
+  .right .fighter-title{text-align:right}
+  .health-rail{height:9px}
+  .health-number{font-size:8px;margin-top:3px}
+  .versus{margin-top:2px}
+  .versus span{font-size:18px}
+  .versus small{display:none}
+  .feedback{top:34%;font-size:19px}
+  .touch-ui{
+    display:flex;left:max(8px,env(safe-area-inset-left,0px));
+    right:max(8px,env(safe-area-inset-right,0px));
+    bottom:max(9px,env(safe-area-inset-bottom,0px));
+    align-items:flex-end;justify-content:space-between;
+    gap:10px;pointer-events:none
+  }
+  .touch-ui button{pointer-events:auto;min-height:44px;border-radius:9px;font-size:10px}
+  .move-buttons{grid-template-columns:repeat(2,46px);gap:6px}
+  .attack-buttons{grid-template-columns:repeat(3,56px);gap:6px}
+  .bottom-ui{bottom:max(10px,env(safe-area-inset-bottom,0px));left:25%;right:25%;align-items:flex-end;justify-content:center}
+  .keys-legend{display:none}
+  .status-panel{
+    width:100%;max-width:220px;padding:5px 8px;
+    background:#071321bd;border-left-width:2px
+  }
+  .status-caption,.status-help,.status-meter{display:none}
+  .status-panel strong{font-size:11px;margin:0 0 3px;letter-spacing:.03em}
+  #modelStatus{font-size:8px!important;margin-top:2px!important}
+  .footer-note{display:none}
+  .center-reticle{display:none}
+}
+@media (orientation:landscape) and (pointer:coarse) and (max-height:390px) {
+  .topbar{padding-top:3px}
+  .hud{top:34px}
+  .fighter-title strong{font-size:10px}
+  .touch-ui button{min-height:37px;font-size:9px}
+  .move-buttons{grid-template-columns:repeat(2,41px);gap:4px}
+  .attack-buttons{grid-template-columns:repeat(3,47px);gap:4px}
+  .status-panel{max-width:168px}
+  .status-panel strong{font-size:10px}
+  #modelStatus{font-size:7px!important}
+}
