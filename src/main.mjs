@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createArena } from './arena.mjs';
 import { createFighter } from './fighter.mjs';
-import { attachVeteranoAppearance } from './appearance.mjs';
+import { createVeterano, VETERANO_MESH_STATS } from './veterano-mesh.mjs';
 import { ATTACKS, samplePose, isImpactFrame, clamp } from './motions.mjs';
 
 const $=id=>document.getElementById(id);
@@ -22,17 +22,17 @@ renderer.toneMappingExposure=1.37;
 const scene=new THREE.Scene();
 const arena=createArena(scene);
 const camera=new THREE.PerspectiveCamera(40,1,.05,160);
-const player=createFighter({x:-1.55,accent:0xb62d43});
-const enemy=createFighter({x:1.65,accent:0x48bfda,dummy:true});
+const player=createVeterano({x:-1.23});
+const enemy=createFighter({x:1.23,accent:0x48bfda,dummy:true});
 scene.add(player.root,enemy.root);
-player.root.position.y = 0.28;
-enemy.root.position.y = 0.28;
-const veteranoAppearance = attachVeteranoAppearance(player);
-$('view360')?.addEventListener('click', () => {
-  const enabled = veteranoAppearance.toggleInspection();
-  $('view360').setAttribute('aria-pressed', String(enabled));
-  $('view360').classList.toggle('active', enabled);
-});
+let inspect3D=false;
+function toggle3DView(){
+ inspect3D=!inspect3D;
+ $('view360')?.setAttribute('aria-pressed',String(inspect3D));
+ $('view360')?.classList.toggle('active',inspect3D);
+}
+$('view360')?.addEventListener('click',toggle3DView);
+console.info('Malha 3D do Veterano:',VETERANO_MESH_STATS);
 const target=new THREE.Vector3();
 const keys=new Set();
 const tmp=new THREE.Vector3();
@@ -50,7 +50,7 @@ function resize() {
   const width=Math.max(1,canvas.clientWidth),height=Math.max(1,canvas.clientHeight);
   renderer.setSize(width,height,false);
   camera.aspect=width/height;
-  camera.fov=width<650?51:40;
+  camera.fov=width<650?43:37;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize',resize);
@@ -73,8 +73,8 @@ function healthUpdate(){
   $('enemyNumber').textContent=Math.ceil(enemyHealth)+' / 100';
 }
 function reset(){
-  player.root.position.set(-1.55,.28,0);enemy.root.position.set(1.65,.28,0);
-  veteranoAppearance.setInspection(false);
+  player.root.position.set(-1.23,0,0);enemy.root.position.set(1.23,0,0);
+  inspect3D=false;
   $('view360')?.setAttribute('aria-pressed','false');
   $('view360')?.classList.remove('active');
   playerHealth=enemyHealth=100;roundOver=false;roundEndTime=0;
@@ -103,11 +103,7 @@ function onKeyDown(event) {
   if(moves[key]&&!event.repeat)attack(moves[key]);
   if(key==='w'||key==='arrowup'||key===' ')jump();
   if(key==='r')reset();
-  if(key==='v'&&!event.repeat){
-    const enabled=veteranoAppearance.toggleInspection();
-    $('view360')?.setAttribute('aria-pressed', String(enabled));
-    $('view360')?.classList.toggle('active', enabled);
-  }
+  if(key==='v'&&!event.repeat)toggle3DView();
 }
 window.addEventListener('keydown',onKeyDown);
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -177,7 +173,7 @@ function animatePlayer(dt){
   else if(crouching) {poseName='crouch';}
   else if(moving!==0){poseName='walk';walkPhase+=dt*10.2;}
   if((poseName==='idle'||poseName==='walk')&&moving!==0&&!roundOver&&jumpHeight<=.02){
-    player.root.position.x=clamp(player.root.position.x+moving*2.35*dt,-3.7,3.7);
+    player.root.position.x=clamp(player.root.position.x+moving*2.35*dt,-5.65,5.65);
   }
   if(jumpVelocity!==0||jumpHeight>0){
     jumpHeight+=jumpVelocity*dt;
@@ -188,8 +184,7 @@ function animatePlayer(dt){
   const p=samplePose(poseName,t,duration,walkPhase);
   player.applyPose(p,dt);
   const facing=player.root.position.x<enemy.root.position.x?1:-1;
-  player.setFacing(facing);
-  veteranoAppearance.update({pose:poseName, time:t, dt, facing, actionProgress:ATTACKS[poseName]?t/duration:0});
+  if(inspect3D)player.root.rotation.y+=dt*.8;else player.setFacing(facing);
   const gap=enemy.root.position.x-player.root.position.x;
   if(Math.abs(gap)<.78){
     player.root.position.x=enemy.root.position.x-Math.sign(gap||1)*.78;
@@ -227,18 +222,18 @@ function render(){
   const mid=(player.root.position.x+enemy.root.position.x)/2;
   const distance=Math.abs(enemy.root.position.x-player.root.position.x);
   const portrait=window.innerWidth<700;
-  const desiredZ=(portrait?18.1:12.8)+Math.max(0,distance-3)*.7;
-  target.set(mid*.45,2.0,desiredZ);
+  const desiredZ=(portrait?10.9:10.1)+Math.max(0,distance-2.5)*.97;
+  target.set(mid*.65,1.77,desiredZ);
   camera.position.lerp(target,Math.min(1,dt*2.9));
   camera.position.x+=(Math.random()-.5)*screenShake;
   camera.position.y+=(Math.random()-.5)*screenShake*.7;
   screenShake*=Math.exp(-dt*16);
-  camera.lookAt(mid*.40,1.23,0);
+  camera.lookAt(mid*.65,1.20,0);
   renderer.render(scene,camera);
   requestAnimationFrame(render);
 }
-camera.position.set(0,2.1,13.3);
+camera.position.set(0,1.77,10.9);
 healthUpdate();
 $('loading').classList.add('done');
-showFeedback('VETERANO NO RINGUE',1.8);
+showFeedback('VETERANO 3D · DISTRITO DAS SOMBRAS',1.8);
 render();
