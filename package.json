@@ -1,0 +1,14 @@
+{
+  "name": "shadow-clash",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Protótipo de luta 3D com malha esquelética e arena de rua industrial",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/veterano-mesh.mjs && node --check src/export-veterano.mjs && node --check src/main.mjs && node --check src/arena.mjs"
+  },
+  "devDependencies": {
+    "three": "0.166.1"
+  }
+}
