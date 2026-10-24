@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#090e17" />
+  <title>Shadow Clash — Protótipo de Combate 3D</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <main id="game" aria-label="Shadow Clash, protótipo de combate 3D">
+    <canvas id="scene" aria-label="Arena 3D de luta, com um lutador e um alvo de treinamento"></canvas>
+    <header class="topbar">
+      <div class="brand"><div class="mark">SC<span>.</span></div><div><strong>SHADOW CLASH</strong><small>PRE-ALPHA <span class="separator">/</span> ARENA 01</small></div></div>
+      <div class="round-tag">DISTRITO DAS SOMBRAS <span>·</span> TREINAMENTO</div>
+      <button id="reset" class="reset" aria-label="Reiniciar combate">↻ <span>REINICIAR</span></button>
+    </header>
+    <div class="hud">
+      <div class="fighter-panel left">
+        <div class="fighter-title"><strong>VETERANO</strong><span>JOGADOR 01</span></div>
+        <div class="health-rail"><div class="health-value" id="playerHealth"></div></div>
+        <div class="health-number" id="playerNumber">100 / 100</div>
+      </div>
+      <div class="versus"><span>VS</span><small>ROUND 01</small></div>
+      <div class="fighter-panel right">
+        <div class="fighter-title"><strong>SENTINELA</strong><span>ALVO DE TREINO</span></div>
+        <div class="health-rail"><div class="health-value enemy" id="enemyHealth"></div></div>
+        <div class="health-number" id="enemyNumber">100 / 100</div>
+      </div>
+    </div>
+    <div id="feedback" class="feedback" aria-live="polite"></div>
+    <div class="center-reticle" aria-hidden="true"></div>
+    <div class="bottom-ui">
+      <div class="keys-legend">
+        <div class="legend-title">CONTROLES <span>TECLADO</span></div>
+        <div class="key-row"><kbd>A</kbd><kbd>D</kbd><span>DESLOCAR</span><kbd>W</kbd><span>SALTAR</span><kbd>S</kbd><span>AGACHAR</span></div>
+        <div class="key-row"><kbd>J</kbd><span>JAB</span><kbd>K</kbd><span>FORTE</span><kbd>H</kbd><span>GANCHO</span></div>
+        <div class="key-row"><kbd>L</kbd><span>CHUTE BAIXO</span><kbd>O</kbd><span>CHUTE ALTO</span><kbd>I</kbd><span>DEFESA</span><kbd>U</kbd><span>ESPECIAL</span></div>
+      </div>
+      <div class="status-panel"><span class="status-caption">MOVIMENTO ATUAL</span><strong id="actionName">GUARDA</strong><div class="status-meter"><i id="actionMeter"></i></div><span class="status-help" id="comboText">Aproxime-se e conecte os golpes.</span></div>
+    </div>
+    <div class="touch-ui" aria-label="Controles de toque">
+      <div class="move-buttons"><button data-hold="a" aria-label="Mover para esquerda">◀</button><button data-hold="d" aria-label="Mover para direita">▶</button><button data-action="jump" aria-label="Saltar">↑</button><button data-hold="s" aria-label="Agachar">↓</button></div>
+      <div class="attack-buttons"><button data-action="jab">JAB</button><button data-action="heavy">FORTE</button><button data-action="lowKick">CHUTE</button><button data-hold="i">DEF.</button><button data-action="special" class="special">UMBRA</button></div>
+    </div>
+    <div class="footer-note">PROTÓTIPO 3D COM ESQUELETO PROCEDURAL · PERSONAGEM DEFINITIVO AINDA NÃO IMPORTADO</div>
+    <div class="loading" id="loading"><div class="loading-mark">SC<span>.</span></div><p>INICIALIZANDO ARENA 3D...</p></div>
+  </main>
+  <script type="module" src="src/main.mjs"></script>
+</body>
+</html>
