@@ -12,10 +12,11 @@
 </head>
 <body>
   <main id="game" aria-label="Shadow Clash, protótipo de combate 3D">
-    <canvas id="scene" aria-label="Arena 3D de luta, com um lutador e um alvo de treinamento"></canvas>
+    <canvas id="scene" aria-label="Ringue 3D de luta com Veterano, personagem baseado em turntable de 360 graus"></canvas>
     <header class="topbar">
-      <div class="brand"><div class="mark">SC<span>.</span></div><div><strong>SHADOW CLASH</strong><small>PRE-ALPHA <span class="separator">/</span> ARENA 01</small></div></div>
-      <div class="round-tag">DISTRITO DAS SOMBRAS <span>·</span> TREINAMENTO</div>
+      <div class="brand"><div class="mark">SC<span>.</span></div><div><strong>SHADOW CLASH</strong><small>PRE-ALPHA <span class="separator">/</span> RINGUE 01</small></div></div>
+      <div class="round-tag">RINGUE CENTRAL <span>·</span> TREINAMENTO</div>
+      <button id="view360" class="reset inspect" type="button" aria-label="Exibir vistas 360 graus do Veterano" aria-pressed="false">360°</button>
       <button id="reset" class="reset" aria-label="Reiniciar combate">↻ <span>REINICIAR</span></button>
     </header>
     <div class="hud">
@@ -38,7 +39,7 @@
         <div class="legend-title">CONTROLES <span>TECLADO</span></div>
         <div class="key-row"><kbd>A</kbd><kbd>D</kbd><span>DESLOCAR</span><kbd>W</kbd><span>SALTAR</span><kbd>S</kbd><span>AGACHAR</span></div>
         <div class="key-row"><kbd>J</kbd><span>JAB</span><kbd>K</kbd><span>FORTE</span><kbd>H</kbd><span>GANCHO</span></div>
-        <div class="key-row"><kbd>L</kbd><span>CHUTE BAIXO</span><kbd>O</kbd><span>CHUTE ALTO</span><kbd>I</kbd><span>DEFESA</span><kbd>U</kbd><span>ESPECIAL</span></div>
+        <div class="key-row"><kbd>L</kbd><span>CHUTE BAIXO</span><kbd>O</kbd><span>CHUTE ALTO</span><kbd>I</kbd><span>DEFESA</span><kbd>U</kbd><span>ESPECIAL</span><kbd>V</kbd><span>360°</span></div>
       </div>
       <div class="status-panel"><span class="status-caption">MOVIMENTO ATUAL</span><strong id="actionName">GUARDA</strong><div class="status-meter"><i id="actionMeter"></i></div><span class="status-help" id="comboText">Aproxime-se e conecte os golpes.</span></div>
     </div>
@@ -46,7 +47,7 @@
       <div class="move-buttons"><button data-hold="a" aria-label="Mover para esquerda">◀</button><button data-hold="d" aria-label="Mover para direita">▶</button><button data-action="jump" aria-label="Saltar">↑</button><button data-hold="s" aria-label="Agachar">↓</button></div>
       <div class="attack-buttons"><button data-action="jab">JAB</button><button data-action="heavy">FORTE</button><button data-action="lowKick">CHUTE</button><button data-hold="i">DEF.</button><button data-action="special" class="special">UMBRA</button></div>
     </div>
-    <div class="footer-note">PROTÓTIPO 3D COM ESQUELETO PROCEDURAL · PERSONAGEM DEFINITIVO AINDA NÃO IMPORTADO</div>
+    <div class="footer-note">VETERANO EM 2.5D COM VISTAS 360° · MODELO 3D RIGGADO AINDA NÃO IMPORTADO</div>
     <div class="loading" id="loading"><div class="loading-mark">SC<span>.</span></div><p>INICIALIZANDO ARENA 3D...</p></div>
   </main>
   <script type="module" src="src/main.mjs"></script>
