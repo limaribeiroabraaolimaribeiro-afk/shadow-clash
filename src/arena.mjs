@@ -25,6 +25,20 @@ function signTexture(){
 export function createArena(scene){
  scene.background=new THREE.Color(0x091521);
  scene.fog=new THREE.FogExp2(0x102535,.023);
+ // A imagem previamente aprovada serve de panorama distante. O combate,
+ // a pista e os objetos em primeiro plano continuam geometria 3D real.
+ const approvedImage=new THREE.TextureLoader().load(
+   new URL('../assets/arena/rua-industrial-aprovada.jpg',import.meta.url).href
+ );
+ approvedImage.colorSpace=THREE.SRGBColorSpace;
+ approvedImage.anisotropy=4;
+ const panorama=new THREE.Mesh(
+   new THREE.PlaneGeometry(37,20.7),
+   new THREE.MeshBasicMaterial({map:approvedImage,fog:false,side:THREE.DoubleSide,toneMapped:false})
+ );
+ panorama.position.set(0,6,-24);
+ panorama.name='PanoramaRuaAprovada';
+ scene.add(panorama);
  scene.add(new THREE.HemisphereLight(0x91b4d4,0x1c1517,1.55));
  const moon=new THREE.DirectionalLight(0xcbe8f8,2.25);
  moon.position.set(-2,12,8);moon.castShadow=true;
