@@ -273,8 +273,12 @@ loadVeteranoGLB({x:-1.23}).then(real=>{
   console.info('Veterano GLB importado:',real.mesh.geometry.getAttribute('position').count,
     'vertices;',real.mesh.skeleton.bones.length,'ossos;',
     real.animations.length,'clipes embutidos');
+  const modelStatus=$('modelStatus');
+  if(modelStatus){modelStatus.textContent='MALHA GLB ATIVA · '+real.mesh.skeleton.bones.length+' OSSOS · '+real.animations.length+' ANIMAÇÕES';modelStatus.style.color='#a7eedb';}
   showFeedback('VETERANO 3D · GLB IMPORTADO',1.4);
 }).catch(error=>{
   console.error('Falha no GLB, personagem procedural permanece ativo:',error);
+  const modelStatus=$('modelStatus');
+  if(modelStatus){modelStatus.textContent='FALHA AO CARREGAR GLB · MODELO DE RESERVA';modelStatus.style.color='#ffb8ab';}
   showFeedback('GLB INDISPONÍVEL · MODO RESERVA',1.5);
 });
