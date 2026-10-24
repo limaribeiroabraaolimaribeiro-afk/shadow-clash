@@ -42,7 +42,7 @@ $('exportGlb')?.addEventListener('click',async()=>{
  }catch(error){
   console.error('Erro ao exportar o GLB',error);
   showFeedback('ERRO NO GLB — VER CONSOLE',2.3);
- }finally{b.disabled=false;b.textContent='BAIXAR 3D';}
+ }finally{b.disabled=false;b.textContent='GLB';}
 });
 console.info('Malha 3D do Veterano:',VETERANO_MESH_STATS);
 const target=new THREE.Vector3();
