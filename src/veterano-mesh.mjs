@@ -194,7 +194,7 @@ export function createVeterano({x=0}={}){
  bob.updateMatrixWorld(true);
  const mesh=new THREE.SkinnedMesh(geometry,mats);mesh.name='VeteranoReal3D';
  mesh.castShadow=true;mesh.receiveShadow=true;mesh.frustumCulled=false;
- mesh.bind(new THREE.Skeleton(bones));bob.add(mesh);
+ bob.add(mesh);root.updateMatrixWorld(true);mesh.bind(new THREE.Skeleton(bones));
  const joints=Object.fromEntries(bones.map(b=>[b.name,b]));
  const targets={
   pelvisY:[joints.Pelvis,'position','y',1.05],pelvisX:[joints.Pelvis,'position','x',0],
