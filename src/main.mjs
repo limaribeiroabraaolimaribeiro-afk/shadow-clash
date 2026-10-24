@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createArena } from './arena.mjs';
 import { createFighter } from './fighter.mjs';
+import { attachVeteranoAppearance } from './appearance.mjs';
 import { ATTACKS, samplePose, isImpactFrame, clamp } from './motions.mjs';
 
 const $=id=>document.getElementById(id);
@@ -24,6 +25,14 @@ const camera=new THREE.PerspectiveCamera(40,1,.05,160);
 const player=createFighter({x:-1.55,accent:0xb62d43});
 const enemy=createFighter({x:1.65,accent:0x48bfda,dummy:true});
 scene.add(player.root,enemy.root);
+player.root.position.y = 0.28;
+enemy.root.position.y = 0.28;
+const veteranoAppearance = attachVeteranoAppearance(player);
+$('view360')?.addEventListener('click', () => {
+  const enabled = veteranoAppearance.toggleInspection();
+  $('view360').setAttribute('aria-pressed', String(enabled));
+  $('view360').classList.toggle('active', enabled);
+});
 const target=new THREE.Vector3();
 const keys=new Set();
 const tmp=new THREE.Vector3();
@@ -64,7 +73,10 @@ function healthUpdate(){
   $('enemyNumber').textContent=Math.ceil(enemyHealth)+' / 100';
 }
 function reset(){
-  player.root.position.set(-1.55,0,0);enemy.root.position.set(1.65,0,0);
+  player.root.position.set(-1.55,.28,0);enemy.root.position.set(1.65,.28,0);
+  veteranoAppearance.setInspection(false);
+  $('view360')?.setAttribute('aria-pressed','false');
+  $('view360')?.classList.remove('active');
   playerHealth=enemyHealth=100;roundOver=false;roundEndTime=0;
   action={name:'idle',t:0,duration:0};opponentAction={name:'idle',t:0,duration:0};
   jumpVelocity=jumpHeight=0;combo=0;comboWindow=0;screenShake=0;
@@ -91,6 +103,11 @@ function onKeyDown(event) {
   if(moves[key]&&!event.repeat)attack(moves[key]);
   if(key==='w'||key==='arrowup'||key===' ')jump();
   if(key==='r')reset();
+  if(key==='v'&&!event.repeat){
+    const enabled=veteranoAppearance.toggleInspection();
+    $('view360')?.setAttribute('aria-pressed', String(enabled));
+    $('view360')?.classList.toggle('active', enabled);
+  }
 }
 window.addEventListener('keydown',onKeyDown);
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -116,7 +133,7 @@ function impactFx(contact,accent,intensity=1) {
   effects.push({mesh:flash,material,life:.30,total:.30,kind:'flash',intensity});
   const ringMat=new THREE.MeshBasicMaterial({color:accent,transparent:true,opacity:.7,side:THREE.DoubleSide,depthWrite:false});
   const ring=new THREE.Mesh(RING_GEO,ringMat);
-  ring.position.set(contact.x,.035,contact.z);ring.rotation.x=-Math.PI/2;
+  ring.position.set(contact.x,.31,contact.z);ring.rotation.x=-Math.PI/2;
   scene.add(ring);
   effects.push({mesh:ring,material:ringMat,life:.53,total:.53,kind:'ring',intensity});
 }
@@ -125,7 +142,7 @@ function hitTarget(attackName){
   const distance=Math.abs(player.root.position.x-enemy.root.position.x);
   if(distance>data.range){showFeedback('FORA DE ALCANCE',.36);combo=0;return;}
   enemyHealth=Math.max(0,enemyHealth-data.damage);
-  enemy.root.position.x=Math.min(5.8,enemy.root.position.x+data.knockback);
+  enemy.root.position.x=Math.min(3.7,enemy.root.position.x+data.knockback);
   opponentAction={name:'hit',t:0,duration:.42};
   player.glove.getWorldPosition(tmp);
   tmp.x=(player.root.position.x+enemy.root.position.x)/2;
@@ -160,7 +177,7 @@ function animatePlayer(dt){
   else if(crouching) {poseName='crouch';}
   else if(moving!==0){poseName='walk';walkPhase+=dt*10.2;}
   if((poseName==='idle'||poseName==='walk')&&moving!==0&&!roundOver&&jumpHeight<=.02){
-    player.root.position.x=clamp(player.root.position.x+moving*2.35*dt,-5.95,5.95);
+    player.root.position.x=clamp(player.root.position.x+moving*2.35*dt,-3.7,3.7);
   }
   if(jumpVelocity!==0||jumpHeight>0){
     jumpHeight+=jumpVelocity*dt;
@@ -170,7 +187,9 @@ function animatePlayer(dt){
   player.bob.position.y=jumpHeight;
   const p=samplePose(poseName,t,duration,walkPhase);
   player.applyPose(p,dt);
-  player.setFacing(player.root.position.x<enemy.root.position.x?1:-1);
+  const facing=player.root.position.x<enemy.root.position.x?1:-1;
+  player.setFacing(facing);
+  veteranoAppearance.update({pose:poseName, time:t, dt, facing, actionProgress:ATTACKS[poseName]?t/duration:0});
   const gap=enemy.root.position.x-player.root.position.x;
   if(Math.abs(gap)<.78){
     player.root.position.x=enemy.root.position.x-Math.sign(gap||1)*.78;
@@ -221,5 +240,5 @@ function render(){
 camera.position.set(0,2.1,13.3);
 healthUpdate();
 $('loading').classList.add('done');
-showFeedback('PRONTO PARA LUTAR',1.8);
+showFeedback('VETERANO NO RINGUE',1.8);
 render();
