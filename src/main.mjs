@@ -70,11 +70,37 @@ function resize() {
   const width=Math.max(1,canvas.clientWidth),height=Math.max(1,canvas.clientHeight);
   renderer.setSize(width,height,false);
   camera.aspect=width/height;
-  camera.fov=width<650?43:37;
+  const mobileLandscape=window.matchMedia('(orientation:landscape) and (pointer:coarse)').matches;
+  camera.fov=mobileLandscape?35:(width<650?43:37);
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize',resize);
+window.addEventListener('orientationchange',resize);
+window.visualViewport?.addEventListener('resize',resize);
+document.addEventListener('fullscreenchange',resize);
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(canvas);
 resize();
+
+// Mobile browsers usually require a fullscreen user gesture before allowing
+// a landscape orientation lock. If unavailable, tell players to rotate manually.
+$('enterLandscape')?.addEventListener('click',async()=>{
+  const help=$('rotationHelp');
+  try{
+    if(!document.fullscreenElement && document.documentElement.requestFullscreen){
+      await document.documentElement.requestFullscreen({navigationUI:'hide'});
+    }
+  }catch(error){
+    console.info('Fullscreen nao disponivel neste navegador:',error);
+  }
+  try{
+    if(window.screen.orientation?.lock)await window.screen.orientation.lock('landscape');
+  }catch(error){
+    console.info('Bloqueio de orientacao nao disponivel:',error);
+  }
+  resize();
+  if(window.innerHeight>window.innerWidth && help)
+    help.textContent='Gire o celular de lado. Se a tela nao virar, ative a rotacao automatica no Android.';
+});
 
 function status(name, progress=0){
   const names={idle:'GUARDA',walk:'MOVIMENTAÇÃO',jump:'SALTO',crouch:'AGACHADO',block:'DEFESA',hit:'IMPACTO',
@@ -241,21 +267,23 @@ function render(){
   arena.update(dt);updateEffects(dt);
   const mid=(player.root.position.x+enemy.root.position.x)/2;
   const distance=Math.abs(enemy.root.position.x-player.root.position.x);
-  const portrait=window.innerWidth<700;
-  // Keep both fighters large and within horizontal field of view on narrow phones.
+  const mobileLandscape=window.matchMedia('(orientation:landscape) and (pointer:coarse)').matches;
+  const portrait=window.innerHeight>window.innerWidth;
+  // Keep the fighting plane viewed from its side (positive Z), and zoom in on
+  // landscape phones while still keeping both fighters in the camera frame.
   const horizontalHalf=Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5)*camera.aspect);
-  const required=(distance+1.8)/(2*Math.tan(horizontalHalf));
-  const desiredZ=Math.max(portrait?8.6:8.4,required);
-  target.set(mid*.65,1.77,desiredZ);
+  const required=(distance+1.9)/(2*Math.tan(horizontalHalf));
+  const desiredZ=Math.max(mobileLandscape?6.8:(portrait?8.6:8.4),required);
+  target.set(mid*.65,mobileLandscape?1.48:1.77,desiredZ);
   camera.position.lerp(target,Math.min(1,dt*2.9));
   camera.position.x+=(Math.random()-.5)*screenShake;
   camera.position.y+=(Math.random()-.5)*screenShake*.7;
   screenShake*=Math.exp(-dt*16);
-  camera.lookAt(mid*.65,1.20,0);
+  camera.lookAt(mid*.65,mobileLandscape?1.20:1.20,0);
   renderer.render(scene,camera);
   requestAnimationFrame(render);
 }
-camera.position.set(0,1.77,10.9);
+camera.position.set(0,1.52,8.5);
 healthUpdate();
 $('loading').classList.add('done');
 showFeedback('VETERANO 3D · DISTRITO DAS SOMBRAS',1.8);
